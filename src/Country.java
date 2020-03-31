@@ -32,7 +32,7 @@ public class Country {
 	
 	@Override
 	public String toString() {
-		return "Code: " + code + " Name: " + name + " Continent: " + continent.getName() + " Surface Area: " + surfaceArea + " Head of State: " + headOfState;
+		return "Code: " + code + "	Name: " + name + "		Continent: " + continent.getName() + " 		Surface Area: " + surfaceArea + "		Head of State: " + headOfState;
 	}	
 	
 	public static class CountryBuilder {
