@@ -10,9 +10,17 @@ public class Client {
 		ArrayList<Country> countries = dao.getCountries();
 		System.out.println(countries);
 		
-		Country c = dao.findCountryByCode("");
+		Country c = dao.findCountryByCode("UK");
 		System.out.println(c);
-
+		
+		/*
+		Country uk = new Country.CountryBuilder("SZ", "Kingdom of Eswatini", Continent.AFRICA, 17364f, "Mswati III").build();
+		boolean saved = dao.saveCountry(uk);
+		System.out.println(saved);
+		*/
+		
+		ArrayList<Country> search = dao.findCountryByName("united");
+		System.out.println(search);
 	}
 
 }
