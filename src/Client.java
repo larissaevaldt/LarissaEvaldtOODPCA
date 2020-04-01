@@ -68,7 +68,6 @@ public class Client {
 				country = dao.findCountryByCode(code);
 			}while (code.length()>3 || country != null);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -77,7 +76,6 @@ public class Client {
 		try {
 			name = br.readLine();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -122,7 +120,6 @@ public class Client {
 					
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -143,7 +140,6 @@ public class Client {
 		try {
 			headOfState = br.readLine();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -159,6 +155,29 @@ public class Client {
 			anotherOperation();
 		}
 	}
+	
+	public void selectByName() {
+		ArrayList<Country> c = new ArrayList<>();
+		br = new BufferedReader(new InputStreamReader(System.in));
+		String name = "";
+
+		try {
+				System.out.println("------- PLEASE ENTER A COUNTRY NAME --------");
+				name = br.readLine();
+				
+				c = dao.findCountryByName(name);
+				System.out.println("---------------------------------------------------------------------------------------------------------------------");
+				System.out.printf("%-10s%-45s%-22s%-22s%-22s\n","CODE","NAME","CONTINENT", "SURFACE AREA", "HEAD OF STATE");
+				System.out.println("---------------------------------------------------------------------------------------------------------------------");
+				for(int i=0; i < c.size(); i++) {
+					System.out.printf("%-10s%-45s%-22s%-22f%-22s\n",c.get(i).getCode(), c.get(i).getName(), c.get(i).getContinent().getName(), c.get(i).getSurfaceArea(), c.get(i).getHeadOfState());
+				}
+
+		} catch (Exception e) {
+			System.out.println("Error reading input");
+		}
+
+	}
 
 	public void selectByCode() {
 		Country c;
@@ -170,6 +189,10 @@ public class Client {
 				code = br.readLine();
 				
 				c = dao.findCountryByCode(code);
+				if (c == null) {
+					System.out.println("There is no country in the database with that code");
+				} 
+				
 				System.out.println(c);
 
 		} catch (Exception e) {
@@ -177,26 +200,24 @@ public class Client {
 		}
 
 	}
-
+	
+	/*
+	 * The following format code was taken from https://stackoverflow.com/questions/26576909/how-to-format-string-output-so-that-columns-are-evenly-centered
+	 * and changed for this particular case, the % denotes that a special formatting follows, the - is for right padding, the number is the amount of spaces
+	 * and the letter is the format s for string and f for float
+	 */
 	public void printAllCountries() {
 		ArrayList<Country> countries = dao.getCountries();
+		System.out.println("---------------------------------------------------------------------------------------------------------------------");
+		System.out.printf("%-10s%-45s%-22s%-22s%-22s\n","CODE","NAME","CONTINENT", "SURFACE AREA", "HEAD OF STATE");
+		System.out.println("---------------------------------------------------------------------------------------------------------------------");
 		for (int i = 0; i < countries.size(); i++) {
-			System.out.println(countries.get(i));
+			System.out.printf("%-10s%-45s%-22s%-22f%-22s\n",countries.get(i).getCode(), countries.get(i).getName(), countries.get(i).getContinent().getName(), countries.get(i).getSurfaceArea(), countries.get(i).getHeadOfState());
 		}
 	}
-	
-	public static boolean checkIfNumber(String input) {
-        try {
-            Float in = new Float(input);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
-    }
 
 	public void menuSelect() throws IOException {
 
-		// dao = new MySQLCountryDAO();
 		br = new BufferedReader(new InputStreamReader(System.in));
 		String input = ""; // move the input variable to the top
 		// so we can see it later after the catch
@@ -230,9 +251,10 @@ public class Client {
 			selectByCode();
 			anotherOperation();
 		} else if (input.equals("3")) {
-			saveCountry();
+			selectByName();
+			anotherOperation();
 		} else if (input.equals("4")) {
-			// saveCountry();
+			saveCountry();
 		} else if (input.equals("5")) {
 			logout();
 
