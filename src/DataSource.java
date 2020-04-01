@@ -9,13 +9,20 @@ public class DataSource {
 	private String db = "jdbc:mysql://apontejaj.com:3306/world";
 	private String un = "cctstudent";
 	private String pw = "Pass1234!";
-	//this was in the constructor but we made global
+	// this was in the constructor but we made global
 	private Connection conn;
 	private Statement stmt;
 	private ResultSet rs = null;
-	
-	//constructor establishing the connection 
-	public DataSource() {
+
+	// Inner class to hold an instance of the outer class
+	private static class DataSourceHelper {
+
+		private static DataSource instance = new DataSource();
+
+	}
+
+	// constructor establishing the connection
+	private DataSource() {
 
 		try {
 
@@ -40,21 +47,21 @@ public class DataSource {
 			System.out.println(e);
 		}
 	}
-	
-	//method to do a select statement
+
+	// method to do a select statement
 	public ResultSet select(String query) {
-		
+
 		try {
 			rs = stmt.executeQuery(query);
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return rs;
 	}
-	
-	//method to close the connection and the statement
+
+	// method to close the connection and the statement
 	public void closing() {
 		// Close the result set, statement and the connection
 		try {
@@ -66,10 +73,10 @@ public class DataSource {
 			e.printStackTrace();
 		}
 	}
-	
-	//method in charge of posting data or saving data into the database
+
+	// method in charge of posting data or saving data into the database
 	public boolean save(String query) {
-		
+
 		try {
 			stmt.execute(query);
 			return true;
@@ -77,6 +84,10 @@ public class DataSource {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	public static DataSource getInstance() {
+		return DataSourceHelper.instance;
 	}
 
 }
