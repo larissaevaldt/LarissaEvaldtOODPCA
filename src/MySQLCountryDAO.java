@@ -65,7 +65,8 @@ public class MySQLCountryDAO implements CountryDAO {
 			if (rs.next()) {
 				
 				name = rs.getString(2);
-				if(rs.getString(3).equals("")) {
+				
+				if(rs.getString(3).length() == 0) {
 					continent = Continent.valueOf("EMPTY");
 				} else {
 					continent = Continent.valueOf(rs.getString(3).toUpperCase().replaceAll(" ", "_"));
@@ -79,7 +80,6 @@ public class MySQLCountryDAO implements CountryDAO {
 			
 			return null;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -118,7 +118,6 @@ public class MySQLCountryDAO implements CountryDAO {
 
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
