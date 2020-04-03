@@ -45,17 +45,6 @@ public class Client {
 			
 			} while(!isNumberBetweenOneAndTwo(input));
 			
-			/*
-			if(input.equals("1") || input.equals("y") || input.equals("Y")) {
-				menu();
-				menuSelect();
-			} else if(input.equals("2") || input.equals("n") || input.equals("N")) {
-				logout();	
-			}else {
-				System.out.println("Invalid input. Type [Y] or [y] or [1] for yes and [N] or [n] or [2] for no");
-				anotherOperation();
-			}
-			*/
 		}catch(Exception e ) {}
 	}
 	
@@ -110,18 +99,23 @@ public class Client {
 		Continent continent = null;
 		float surfaceArea;
 		String headOfState = null;
-		
 		Country country;
 		
 		//GET THE COUNTRY CODE
 		try {
 			do {
 				System.out.println("Enter 3 characteres for the country code:");
-				System.out.println("(if you get asked to type again, either the code is already taken or it's too long so try again)");
 				code = br.readLine();
-				//search if there is already a country with that code in the database 
+				//search if there is already a country with that code in the database, because if there is we  can't use that code
 				country = dao.findCountryByCode(code);
-			}while (code.length()>3 || country != null);
+				//so print message so client know what's wrong
+				if(!isSizeThree(code)) {
+					System.out.println("Code is too long. Please enter maximum 3 characteres");
+				}
+				if(country != null) {
+					System.out.println("This code is already used. Try another one");
+				}
+			}while (!isSizeThree(code) || country != null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -129,7 +123,13 @@ public class Client {
 		//GET NAME
 		System.out.println("Enter the country name: "); 
 		try {
-			name = br.readLine();
+			do {
+				name = br.readLine();
+				if(!isValidName(name)) {
+					System.out.println("Invalid name. Try again");
+				}
+			} while (!isValidName(name));
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -307,6 +307,19 @@ public class Client {
 	public boolean isNumberBetweenOneAndTwo(String input) {
 		return input.matches("[1-2]+");
 	}
+
+	public boolean isSizeThree(String input) {
+		return input.length() <= 3;
+	}
+	
+	public boolean isValidName(String input) {
+		//name can start or end only with a letter
+		//cannot contain consecutive spaces
+		return input.matches("^([a-zA-Z]+\\s)*[a-zA-Z]+$");
+	}
+	
 }
+		
+	
 
 
