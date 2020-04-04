@@ -34,7 +34,7 @@ public class Country {
 		return "Code: " + code + "	Name: " + name + "		Continent: " + continent.getName() + "	   Surface Area: " + surfaceArea + "	   Head of State: " + headOfState;
 	}	
 	
-	public class CountryBuilder {
+	public static class CountryBuilder {
 		private String code;
 		private String name;
 		private Continent continent;

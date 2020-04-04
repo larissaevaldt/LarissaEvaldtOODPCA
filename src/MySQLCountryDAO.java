@@ -34,9 +34,8 @@ public class MySQLCountryDAO implements CountryDAO {
 				}
 				surfaceArea = rs.getFloat(4);
 				headOfState = rs.getString(5);
-				
-				
-				builder = new Country.CountryBuilder(code, name, continent, surfaceArea, headOfState);
+								
+				builder = new Country.CountryBuilder(code, name, continent, surfaceArea).setHeadOfState(headOfState);
 				country = builder.build();
 				countries.add(country);
 
@@ -74,7 +73,7 @@ public class MySQLCountryDAO implements CountryDAO {
 				surfaceArea = rs.getFloat(4);
 				headOfState = rs.getString(5);
 
-				c = new Country.CountryBuilder(code, name, continent, surfaceArea, headOfState).build();
+				c = new Country.CountryBuilder(code, name, continent, surfaceArea).setHeadOfState(headOfState).build();
 				return c;
 			}
 			
@@ -112,7 +111,7 @@ public class MySQLCountryDAO implements CountryDAO {
 				headOfState = rs.getString(5);
 				
 				
-				builder = new Country.CountryBuilder(code, name, continent, surfaceArea, headOfState);
+				builder = new Country.CountryBuilder(code, name, continent, surfaceArea).setHeadOfState(headOfState);
 				country = builder.build();
 				countries.add(country);
 

@@ -181,6 +181,7 @@ public class Client {
 		}
 		//ASK FOR A SURFACE AREA
 		surfaceArea = 0;
+		//this way the loop will not allow 0 or leaving it blank
 		while (surfaceArea == 0) {
 			System.out.println("Enter a number for the Surface Area:"); 
 		    try {
@@ -199,7 +200,7 @@ public class Client {
 			e.printStackTrace();
 		}
 		
-		Country.CountryBuilder builder = new Country.CountryBuilder(code, name, continent, surfaceArea, headOfState);
+		Country.CountryBuilder builder = new Country.CountryBuilder(code, name, continent, surfaceArea).setHeadOfState(headOfState);
 		return country = builder.build();
 	}
 
