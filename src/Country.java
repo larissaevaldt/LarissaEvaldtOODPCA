@@ -1,4 +1,3 @@
-
 public class Country {
 	private String code;
 	private String name;
@@ -35,19 +34,24 @@ public class Country {
 		return "Code: " + code + "	Name: " + name + "		Continent: " + continent.getName() + "	   Surface Area: " + surfaceArea + "	   Head of State: " + headOfState;
 	}	
 	
-	public static class CountryBuilder {
+	public class CountryBuilder {
 		private String code;
 		private String name;
 		private Continent continent;
 		private float surfaceArea;
 		private String headOfState;
 		
-		public CountryBuilder(String code, String name, Continent continent, float surfaceArea, String headOfState) {
+		public CountryBuilder(String code, String name, Continent continent, float surfaceArea) {
 			this.code = code;
 			this.name = name;
 			this.continent = continent;
 			this.surfaceArea = surfaceArea;
+			this.headOfState = "Undefined";
+		}
+		
+		public CountryBuilder setHeadOfState(String headOfState) {
 			this.headOfState = headOfState;
+			return this;
 		}
 		
 		public Country build() {
