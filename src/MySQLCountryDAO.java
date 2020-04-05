@@ -27,6 +27,7 @@ public class MySQLCountryDAO implements CountryDAO {
 			while (rs.next()) {
 				code = rs.getString(1);
 				name = rs.getString(2);
+				//I added this empty value because some people were managing to add countries without a continent and this was causing the program to crash
 				if(rs.getString(3).equals("")) {
 					continent = Continent.valueOf("EMPTY");
 				} else {
@@ -35,16 +36,14 @@ public class MySQLCountryDAO implements CountryDAO {
 				surfaceArea = rs.getFloat(4);
 				headOfState = rs.getString(5);
 								
-				builder = new Country.CountryBuilder(code, name, continent, surfaceArea).setHeadOfState(headOfState);
+				builder = new Country.CountryBuilder(code, name).setSurfaceArea(surfaceArea).setHeadOfState(headOfState).setContinent(continent);
 				country = builder.build();
 				countries.add(country);
 
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return countries;
 	}
 
@@ -73,10 +72,9 @@ public class MySQLCountryDAO implements CountryDAO {
 				surfaceArea = rs.getFloat(4);
 				headOfState = rs.getString(5);
 
-				c = new Country.CountryBuilder(code, name, continent, surfaceArea).setHeadOfState(headOfState).build();
+				c = new Country.CountryBuilder(code, name).setSurfaceArea(surfaceArea).setHeadOfState(headOfState).setContinent(continent).build();
 				return c;
 			}
-			
 			return null;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -94,8 +92,7 @@ public class MySQLCountryDAO implements CountryDAO {
 		Continent continent = null;
 		float surfaceArea = 0f;
 		String headOfState = "";
-		
-		Country.CountryBuilder builder = null;
+
 		Country country = null;
 
 		try {
@@ -111,15 +108,13 @@ public class MySQLCountryDAO implements CountryDAO {
 				headOfState = rs.getString(5);
 				
 				
-				builder = new Country.CountryBuilder(code, name, continent, surfaceArea).setHeadOfState(headOfState);
-				country = builder.build();
+				country = new Country.CountryBuilder(code, name).setSurfaceArea(surfaceArea).setHeadOfState(headOfState).setContinent(continent).build();
 				countries.add(country);
 
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 		return countries;
 	}
 
@@ -132,8 +127,10 @@ public class MySQLCountryDAO implements CountryDAO {
 		float surfaceArea = country.getSurfaceArea();
 		String headOfState = country.getHeadOfState();
 		
-		String query = "INSERT INTO country (Code, Name, Continent, SurfaceArea, HeadOfState) VALUES ('"+code+"', '"+name+"', '"+continent.getName()+"', "+surfaceArea+", '"+headOfState+"');";
-		return db.save(query);
+		String query = "INSERT INTO country (Code, Name, Continent, SurfaceArea, HeadOfState) VALUES ('"+code+"', '"+name+"', '"+continent.getValue()+"', "+surfaceArea+", '"+headOfState+"');";
+		boolean isSaved = db.save(query);
+		return isSaved;
+		
 	}
 
 }

@@ -31,7 +31,7 @@ public class Country {
 	
 	@Override
 	public String toString() {
-		return "Code: " + code + "	Name: " + name + "		Continent: " + continent.getName() + "	   Surface Area: " + surfaceArea + "	   Head of State: " + headOfState;
+		return "Code: " + code + "	Name: " + name + "		Continent: " + continent.getValue() + "	   Surface Area: " + surfaceArea + "	   Head of State: " + headOfState;
 	}	
 	
 	public static class CountryBuilder {
@@ -41,12 +41,18 @@ public class Country {
 		private float surfaceArea;
 		private String headOfState;
 		
-		public CountryBuilder(String code, String name, Continent continent, float surfaceArea) {
+		public CountryBuilder(String code, String name) {
 			this.code = code;
 			this.name = name;
-			this.continent = continent;
+			this.continent = Continent.ASIA;
+			this.surfaceArea = 0.0f;
+			this.headOfState = null;
+		}
+		
+		
+		public CountryBuilder setSurfaceArea(float surfaceArea) {
 			this.surfaceArea = surfaceArea;
-			this.headOfState = "Undefined";
+			return this;
 		}
 		
 		public CountryBuilder setHeadOfState(String headOfState) {
@@ -57,6 +63,13 @@ public class Country {
 		public Country build() {
 			return new Country(this);
 		}
+
+		public CountryBuilder setContinent(Continent continent) {
+			// TODO Auto-generated method stub
+			this.continent = continent;
+			return this;
+		}
+
 		
 	}
 	

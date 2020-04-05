@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import javax.swing.plaf.synth.SynthDesktopIconUI;
+
 public class Client {
 
 	private MySQLCountryDAO dao = new MySQLCountryDAO();
@@ -19,6 +21,7 @@ public class Client {
 
 	public void logout() {
 		System.out.println("---------------- GOODBYE ------------------");
+		dao.db.closing();
 		System.exit(0);
 	}
 	
@@ -43,7 +46,7 @@ public class Client {
 					System.out.println("Invalid input. Type [1] for yes OR [2] for no");
 				}
 			
-			} while(!isNumberBetweenOneAndTwo(input));
+			} while(!isNumberOneOrTwo(input));
 			
 		}catch(Exception e ) {}
 	}
@@ -78,7 +81,7 @@ public class Client {
 					//if there is 1 or more country, we print them
 					printHeader();
 					for(int i=0; i < c.size(); i++) {
-						System.out.printf("%-10s%-45s%-22s%-22f%-22s\n",c.get(i).getCode(), c.get(i).getName(), c.get(i).getContinent().getName(), c.get(i).getSurfaceArea(), c.get(i).getHeadOfState());
+						System.out.printf("%-10s%-45s%-22s%-22f%-22s\n",c.get(i).getCode(), c.get(i).getName(), c.get(i).getContinent().getValue(), c.get(i).getSurfaceArea(), c.get(i).getHeadOfState());
 					}
 				} else {
 					//if there is none, print a message
@@ -93,13 +96,17 @@ public class Client {
 	
 	public Country createCountry() throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); 
-		String code = null;
-		String name = null;
-		String continentString;
-		Continent continent = null;
-		float surfaceArea;
-		String headOfState = null;
+		Country.CountryBuilder builder;
 		Country country;
+		String code = "";
+		String name = "";
+		String continentString = "";
+		Continent continent = null;
+		float surfaceArea = 0;
+		String headOfState = "";
+		String input;
+		String surfaceAreaString;
+		
 		
 		//GET THE COUNTRY CODE
 		try {
@@ -136,61 +143,88 @@ public class Client {
 		
 		//GET THE CONTINENT from the client, change it to upper case, just for it to work even in case someone types asia, Asia, asiA, for example and cut white spaces
 		//switch case assigns the right continent according to what the client entered and it's inside of a while loop to keep asking for a continent until the client enters a valid one
-		boolean valid = false;
-		while(valid == false) {
-			System.out.println("Enter the continent: (Asia, Europe, North America, Africa, Oceania, Antarctica or South America)"); 
-			try {
-				continentString = br.readLine();
-				String upperCase = continentString.toUpperCase().trim();
-				switch(upperCase) {
-					case("ASIA"):
-						continent = Continent.ASIA;
-						valid = true;
-						break;
-					case("EUROPE"):
-						continent = Continent.EUROPE;
-						valid = true;
-						break;
-					case("NORTH AMERICA"):
-						continent = Continent.NORTH_AMERICA;
-						valid = true;
-						break;
-					case("AFRICA"):
-						continent = Continent.AFRICA;
-						valid = true;
-						break;
-					case("OCEANIA"):
-						continent = Continent.OCEANIA;
-						valid = true;
-						break;
-					case("ANTARCTICA"):
-						continent = Continent.ANTARCTICA;
-						valid = true;
-						break;
-					case("SOUTH AMERICA"):
-						continent = Continent.SOUTH_AMERICA;
-						valid = true;
-						break;
-					default:
-						System.out.println("Invalid Continent. Try again");
-					
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
+		do {
+			System.out.println("Would you like to enter a continent or just go with the default 'Asia'?");
+			System.out.println("Enter [1] if you want to assign a value");
+			System.out.println("Enter [2] if you want to go with the default");
+			
+			input = br.readLine();
+			
+			if(input.equals("1")) {
+				do {
+					System.out.println("Enter the continent: (Asia, Europe, North America, Africa, Oceania, Antarctica or South America)"); 
+					try {
+						continentString = br.readLine();
+						continentString = continentString.toUpperCase().trim();
+						switch(continentString) {
+							case("ASIA"):
+								continent = Continent.ASIA;
+								break;
+							case("EUROPE"):
+								continent = Continent.EUROPE;
+								break;
+							case("NORTH AMERICA"):
+								continent = Continent.NORTH_AMERICA;
+								break;
+							case("AFRICA"):
+								continent = Continent.AFRICA;
+								break;
+							case("OCEANIA"):
+								continent = Continent.OCEANIA;
+								break;
+							case("ANTARCTICA"):
+								continent = Continent.ANTARCTICA;
+								break;
+							case("SOUTH AMERICA"):
+								continent = Continent.SOUTH_AMERICA;
+								break;
+							default:
+								System.out.println("Invalid Continent. Try again");
+						} 
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				} while (!isValidContinent(continentString));
+			} else if (input.equals("2")) {
+				continent = Continent.ASIA;
+			} else {
+				System.out.println("Invalid input. Try again");
 			}
-		}
-		//ASK FOR A SURFACE AREA
-		surfaceArea = 0;
-		//this way the loop will not allow 0 or leaving it blank
-		while (surfaceArea == 0) {
-			System.out.println("Enter a number for the Surface Area:"); 
-		    try {
-		    	surfaceArea = Float.parseFloat(br.readLine());
-		    } catch (NumberFormatException e) {
-		    	 System.out.println("Not a valid surface area. Try entering a number");
-		    	 surfaceArea = 0;
+			
+		} while(!isNumberOneOrTwo(input));
+		
+		
+		/*
+		 ASK FOR A SURFACE AREA
+		
+		 */
+		do {
+			System.out.println("Would you like to enter a surface area or just go with the default of 0.0?");
+			System.out.println("Enter [1] if you want to assign a value");
+			System.out.println("Enter [2] if you want to go with the default");
+			
+			input = br.readLine();
+			
+			if(!isNumberOneOrTwo(input)) {
+				System.out.println("Invalid input. Try again");
 			}
-		}
+			switch(input) {
+				case("1"):
+					do {
+						System.out.println("Please enter a number for the surface area:"); 
+						surfaceAreaString = br.readLine();
+						if(isFloat(surfaceAreaString)) {
+							surfaceArea = Float.parseFloat(surfaceAreaString);
+						} else {
+							System.out.println("Invalid number. Try again");
+						}
+						
+					} while (!isFloat(surfaceAreaString));
+				case("2"):
+					surfaceArea = 0.0f;
+			}
+		}while(!isNumberOneOrTwo(input));
+		
 		
 		//GET HEAD OF STATE
 		System.out.println("Enter the Head of State: "); 
@@ -200,7 +234,11 @@ public class Client {
 			e.printStackTrace();
 		}
 		
-		Country.CountryBuilder builder = new Country.CountryBuilder(code, name, continent, surfaceArea).setHeadOfState(headOfState);
+		//otherwise set the head of state with the name entered by the user
+		builder = new Country.CountryBuilder(code, name).setSurfaceArea(surfaceArea).setContinent(continent);
+		if(!isEmptyString(headOfState)) {
+			builder.setHeadOfState(headOfState);
+		}
 		return country = builder.build();
 	}
 
@@ -231,7 +269,7 @@ public class Client {
 		ArrayList<Country> countries = dao.getCountries();
 		printHeader();
 		for (int i = 0; i < countries.size(); i++) {
-			System.out.printf("%-10s%-45s%-22s%-22f%-22s\n",countries.get(i).getCode(), countries.get(i).getName(), countries.get(i).getContinent().getName(), countries.get(i).getSurfaceArea(), countries.get(i).getHeadOfState());
+			System.out.printf("%-10s%-45s%-22s%-22f%-22s\n",countries.get(i).getCode(), countries.get(i).getName(), countries.get(i).getContinent().getValue(), countries.get(i).getSurfaceArea(), countries.get(i).getHeadOfState());
 		}
 	}
 
@@ -281,7 +319,7 @@ public class Client {
 		System.out.println("enter [2] to FIND a country BY COUNTRY CODE");
 		System.out.println("Enter [3] to FIND a country/countries BY NAME");
 		System.out.println("Enter [4] to SAVE A NEW COUNTRY IN THE DATABASE");
-		System.out.println("Enter [5] to Exit");
+		System.out.println("Enter [5] to QUIT");
 
 	}
 
@@ -305,7 +343,7 @@ public class Client {
 		return input.matches("[1-5]+");
 	}
 	
-	public boolean isNumberBetweenOneAndTwo(String input) {
+	public boolean isNumberOneOrTwo(String input) {
 		return input.matches("[1-2]+");
 	}
 
@@ -317,6 +355,22 @@ public class Client {
 		//name can start or end only with a letter
 		//cannot contain consecutive spaces
 		return input.matches("^([a-zA-Z]+\\s)*[a-zA-Z]+$");
+	}
+	
+	public boolean isEmptyString(String input) {
+		return input.equals("");
+	}
+	
+	public boolean isValidContinent(String input) {
+		input = input.toUpperCase().trim();
+		if(input.equals("ASIA") || input.equals("EUROPE") || input.equals("NORTH AMERICA") || input.equals("AFRICA") || input.equals("OCEANIA") || input.equals("ANTARCTICA") || input.equals("SOUTH AMERICA")) {
+			return true;
+		} 
+		return false;	
+	}
+	
+	public boolean isFloat(String input) {
+		return input.matches("^[0-9]*\\.?,?[0-9]+$");
 	}
 	
 }

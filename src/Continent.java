@@ -8,15 +8,27 @@ public enum Continent {
 	OCEANIA("Oceania"), 
 	ANTARCTICA("Antarctica"), 
 	SOUTH_AMERICA("South America"),
-	EMPTY("");
+	EMPTY(""); 
+	//there is a value for empty, because people managed to add countries without continent and the program was crashing
 	
-	private String name;
 	
-	Continent(String name) {
-		this.name = name;
+	private String value;
+	
+	Continent(String value) {
+		this.value = value;
 	}
 	
-	public String getName() {
-		return this.name;
+	public String getValue() {
+		return this.value;
+	}
+	
+	public Continent getEnum(String continentString) {
+		
+		for(Continent c : Continent.values()) {
+			if(c.getValue().equals(continentString)) {
+				return c;
+			}
+		}
+		return null;
 	}
 }
