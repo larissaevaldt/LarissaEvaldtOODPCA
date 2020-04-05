@@ -3,8 +3,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import javax.swing.plaf.synth.SynthDesktopIconUI;
-
 public class Client {
 
 	private MySQLCountryDAO dao = new MySQLCountryDAO();
@@ -18,13 +16,15 @@ public class Client {
 	public static void main(String[] args) throws IOException {
 		new Client();
 	}
-
+	
+	//prints a goodbye message and closes the connection
 	public void logout() {
-		System.out.println("---------------- GOODBYE ------------------");
-		dao.db.closing();
+		System.out.println("------------------- GOODBYE ---------------------");
+		dao.db.close();
 		System.exit(0);
 	}
-	
+	//method asks user if want to do another operation and validates the input only allowing the user to enter 1 or 2 
+	//if they want then the menu is presented again, if not then quit program
 	public void anotherOperation() {
 		System.out.println("Would you like to do another operation?");
 		System.out.println("Type [1] for YES");
@@ -43,14 +43,15 @@ public class Client {
 				} else if(input.equals("2")) {
 					logout();
 				} else {
-					System.out.println("Invalid input. Type [1] for yes OR [2] for no");
+					System.out.println("Invalid input. Type [1] for YES or [2] for NO");
 				}
-			
 			} while(!isNumberOneOrTwo(input));
 			
 		}catch(Exception e ) {}
 	}
 	
+	//method calls the create country method first and then saves in the database through the DAO method 
+	//also prints a message for the user to know if the country was added or not
 	public void saveCountry() throws IOException {
 		
 		Country c = createCountry();
@@ -58,20 +59,21 @@ public class Client {
 		boolean saved = dao.saveCountry(c);
 		if(saved) {
 			System.out.println("Country successly added");
-			anotherOperation();
 		} else {
 			System.out.println("Something wen't wrong and the country was not added. Try again");
-			anotherOperation();
 		}
 	}
 	
+	//asks user for a name and then call the findCountryByName from MySQLCountryDAO class
+	//saves the countries in an array list and if it finds one or more countries it prints them nicely formatted
+	//otherwise prints a message saying there is no country in the database
 	public void selectByName() {
 		ArrayList<Country> c = new ArrayList<>();
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		String name = "";
 
 		try {
-				System.out.println("------- PLEASE ENTER A COUNTRY NAME --------");
+				System.out.println("---------- PLEASE ENTER A COUNTRY NAME -----------");
 				name = br.readLine();
 				
 				c = dao.findCountryByName(name);
@@ -94,6 +96,8 @@ public class Client {
 
 	}
 	
+	//method asks the user for all the attributes, for the continent, surfaceArea and headOfState it asks if the user wants to enter or go with the default value since it's optional
+	//validate each input, and then create a country through the CountryBuilder class and return it
 	public Country createCountry() throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); 
 		Country.CountryBuilder builder;
@@ -108,14 +112,15 @@ public class Client {
 		String surfaceAreaString;
 		
 		
-		//GET THE COUNTRY CODE
+		//ASK USER FOR THE COUNTRY CODE
 		try {
+			//keep asking until user enter a valid code (less than 3 characters)
 			do {
-				System.out.println("Enter 3 characteres for the country code:");
+				System.out.println("Enter a maximum 3 character country code:");
 				code = br.readLine();
 				//search if there is already a country with that code in the database, because if there is we  can't use that code
 				country = dao.findCountryByCode(code);
-				//so print message so client know what's wrong
+				//print message so client know what's wrong
 				if(!isSizeThree(code)) {
 					System.out.println("Code is too long. Please enter maximum 3 characteres");
 				}
@@ -130,6 +135,7 @@ public class Client {
 		//GET NAME
 		System.out.println("Enter the country name: "); 
 		try {
+			//keep asking until a valid name is entered (only a-z characters and no consecutive white spaces)
 			do {
 				name = br.readLine();
 				if(!isValidName(name)) {
@@ -141,8 +147,8 @@ public class Client {
 			e.printStackTrace();
 		}
 		
-		//GET THE CONTINENT from the client, change it to upper case, just for it to work even in case someone types asia, Asia, asiA, for example and cut white spaces
-		//switch case assigns the right continent according to what the client entered and it's inside of a while loop to keep asking for a continent until the client enters a valid one
+		//ASK USER IF THEY WANT TO ENTER A CONTINENT OR GO WITH THE DEFAULT
+		//do while loop to keep asking for a continent until the client enters a valid one
 		do {
 			System.out.println("Would you like to enter a continent or just go with the default 'Asia'?");
 			System.out.println("Enter [1] if you want to assign a value");
@@ -155,7 +161,9 @@ public class Client {
 					System.out.println("Enter the continent: (Asia, Europe, North America, Africa, Oceania, Antarctica or South America)"); 
 					try {
 						continentString = br.readLine();
+						//change it to upper case, just for it to work even in case someone types asia, Asia, asiA, for example and cut white spaces
 						continentString = continentString.toUpperCase().trim();
+						//assign the right continent according to what the client entered
 						switch(continentString) {
 							case("ASIA"):
 								continent = Continent.ASIA;
@@ -186,6 +194,7 @@ public class Client {
 					}
 				} while (!isValidContinent(continentString));
 			} else if (input.equals("2")) {
+				//assign the default value
 				continent = Continent.ASIA;
 			} else {
 				System.out.println("Invalid input. Try again");
@@ -194,10 +203,9 @@ public class Client {
 		} while(!isNumberOneOrTwo(input));
 		
 		
-		/*
-		 ASK FOR A SURFACE AREA
-		
-		 */
+
+		 //ASK USER FOR A SURFACE AREA, IF THEY WANT TO ADD ONE OR GO WITH THE DEFAULT
+		// do while loop to keep asking until a valid number is entered
 		do {
 			System.out.println("Would you like to enter a surface area or just go with the default of 0.0?");
 			System.out.println("Enter [1] if you want to assign a value");
@@ -208,6 +216,8 @@ public class Client {
 			if(!isNumberOneOrTwo(input)) {
 				System.out.println("Invalid input. Try again");
 			}
+			//switch to first check if its a valid float number and then convert the string to float if user enter 1
+			//and assign the default value if user enters 2
 			switch(input) {
 				case("1"):
 					do {
@@ -226,37 +236,41 @@ public class Client {
 		}while(!isNumberOneOrTwo(input));
 		
 		
-		//GET HEAD OF STATE
-		System.out.println("Enter the Head of State: "); 
+		//ASK USER FOR A HEAD OF STATE
+		System.out.println("Enter the Head of State: (Just press enter to save without one)"); 
 		try {
 			headOfState = br.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		//otherwise set the head of state with the name entered by the user
+		//FIRST CREATE A BUILDER WITHOUT HEAD OF STATE THEN CHECKS IF THE HEAD OF STATE STRING IS EMPTY
+		//IF IT'S NOT EMPTY THE USER ENTERED A HEAD OF STATE SO WE NEED TO CHANGE 
 		builder = new Country.CountryBuilder(code, name).setSurfaceArea(surfaceArea).setContinent(continent);
 		if(!isEmptyString(headOfState)) {
 			builder.setHeadOfState(headOfState);
 		}
+		//CREATE A COUNTRY AND RETURN IT
 		return country = builder.build();
 	}
-
+	
+	//method asks user to enter a code and uses the findCountryByCode method from MySQLCountryDAO class
+	//Prints the country if it finds and a message if it doesn't
 	public void selectByCode() {
 		Country c;
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		String code = "";
 
 		try {
-				System.out.println("------- PLEASE ENTER A COUNTRY CODE --------");
+				System.out.println("---------- PLEASE ENTER A COUNTRY CODE -----------");
 				code = br.readLine();
-				
 				c = dao.findCountryByCode(code);
 				if (c == null) {
 					System.out.println("There is no country in the database with that code");
 				} 
-				
+				System.out.println("--------------------------------------------------------------------------------------------------------------------------");
 				System.out.println(c);
+				System.out.println("--------------------------------------------------------------------------------------------------------------------------");
 
 		} catch (Exception e) {
 			System.out.println("Error reading input");
@@ -266,13 +280,17 @@ public class Client {
 	
 	
 	public void printAllCountries() {
+		//call the MySQLCountryDAO class method getCountries, save it to an ArrayList
 		ArrayList<Country> countries = dao.getCountries();
+		//print a header to look nicer
 		printHeader();
+		//loop through the countries printing them in a nice formatted way
 		for (int i = 0; i < countries.size(); i++) {
 			System.out.printf("%-10s%-45s%-22s%-22f%-22s\n",countries.get(i).getCode(), countries.get(i).getName(), countries.get(i).getContinent().getValue(), countries.get(i).getSurfaceArea(), countries.get(i).getHeadOfState());
 		}
 	}
-
+	
+	//ask user to enter a number according to what they want to do, validate if entered a valid number (1-5) and execute other methods according to the number entered
 	public void menuSelect() throws IOException {
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -282,7 +300,7 @@ public class Client {
 		try {
 
 			do {
-				System.out.println("------- What would you like to do? --------");
+				System.out.println("----------- What would you like to do? -----------");
 				input = br.readLine();
 
 				if (!isNumberBetweenOneAndFive(input)) {
@@ -307,11 +325,13 @@ public class Client {
 			anotherOperation();
 		} else if (input.equals("4")) {
 			saveCountry();
+			anotherOperation();
 		} else {
 			logout();
 		} 
 	}
-
+	
+	//method prints the instructions for the user to enter a number according to what they want to do
 	public void menu() {
 
 		System.out.println("Please select an option from the menu below:");
@@ -322,12 +342,14 @@ public class Client {
 		System.out.println("Enter [5] to QUIT");
 
 	}
-
+	
+	//simple welcome message
 	public void welcome() {
 		System.out.println("-------------------  WELCOME ---------------------");
 	}
 	
 	/*
+	 * Simply prints a header on top of the results from the database so it looks better
 	 * The following format code was taken from https://stackoverflow.com/questions/26576909/how-to-format-string-output-so-that-columns-are-evenly-centered
 	 * and changed for this particular case, the % denotes that a special formatting follows, the - is for right padding, without - it would pad to the left, the number is the amount of spaces
 	 * and the letter is the data format, s for string and f for float, \n to go to the next line. The same logic is used in the loop to print the actual content in the method print all countries and search by name as well
@@ -338,7 +360,7 @@ public class Client {
 		System.out.println("---------------------------------------------------------------------------------------------------------------------");
 	}
 	
-	//validations
+	//VALIDATIONS
 	public boolean isNumberBetweenOneAndFive(String input) {
 		return input.matches("[1-5]+");
 	}
@@ -369,6 +391,8 @@ public class Client {
 		return false;	
 	}
 	
+	//method checks if the string entered can be converted to a float
+	//regex expression found on this link https://regexr.com/35aig
 	public boolean isFloat(String input) {
 		return input.matches("^[0-9]*\\.?,?[0-9]+$");
 	}

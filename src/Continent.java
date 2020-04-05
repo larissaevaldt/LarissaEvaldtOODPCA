@@ -1,6 +1,6 @@
 
 public enum Continent {
-	
+	//there is a value for empty, because people managed to add countries without continent and the program was crashing
 	ASIA("Asia"), 
 	EUROPE("Europe"), 
 	NORTH_AMERICA("North America"), 
@@ -9,8 +9,6 @@ public enum Continent {
 	ANTARCTICA("Antarctica"), 
 	SOUTH_AMERICA("South America"),
 	EMPTY(""); 
-	//there is a value for empty, because people managed to add countries without continent and the program was crashing
-	
 	
 	private String value;
 	
@@ -21,14 +19,5 @@ public enum Continent {
 	public String getValue() {
 		return this.value;
 	}
-	
-	public Continent getEnum(String continentString) {
-		
-		for(Continent c : Continent.values()) {
-			if(c.getValue().equals(continentString)) {
-				return c;
-			}
-		}
-		return null;
-	}
+
 }

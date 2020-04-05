@@ -4,10 +4,10 @@ import java.util.ArrayList;
 
 
 public class MySQLCountryDAO implements CountryDAO {
-	
+	//connect to the database
 	DataSource db = DataSource.getInstance();
-
-	@Override
+	
+	// retrieve all of the countries in the database, save them to an ArrayList and return the array
 	public ArrayList<Country> getCountries() {
 		ArrayList<Country> countries = new ArrayList<>();
 		
@@ -24,30 +24,38 @@ public class MySQLCountryDAO implements CountryDAO {
 		Country country = null;
 
 		try {
+			//loop until the last entry in the database
 			while (rs.next()) {
+				//assign whatever is in column one to the variable code and so on
 				code = rs.getString(1);
 				name = rs.getString(2);
-				//I added this empty value because some people were managing to add countries without a continent and this was causing the program to crash
+				//first checks if the column Continent is empty, because it seems it's possible to add countries without a continent
 				if(rs.getString(3).equals("")) {
 					continent = Continent.valueOf("EMPTY");
 				} else {
+					//if there is a continent, for the valueOf method to work we need to pass the exact value of the Enum
+					//for example NORTH_AMERICA, so the string read from the database is changed to upper case and the spaces replaced with underscore 
 					continent = Continent.valueOf(rs.getString(3).toUpperCase().replaceAll(" ", "_"));
 				}
 				surfaceArea = rs.getFloat(4);
 				headOfState = rs.getString(5);
-								
+				
+				//create the country
 				builder = new Country.CountryBuilder(code, name).setSurfaceArea(surfaceArea).setHeadOfState(headOfState).setContinent(continent);
 				country = builder.build();
+				//add to the arrayList
 				countries.add(country);
 
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		//return the arrayList
 		return countries;
 	}
 
-	@Override
+	//receives a country code, search the database if there is a country with that code
+	//assign the values in each column to variables, create a country with those values and return it
 	public Country findCountryByCode(String code) {
 		String query = "SELECT * FROM country WHERE code = '" + code + "';";
 		ResultSet rs = db.select(query);
@@ -82,7 +90,8 @@ public class MySQLCountryDAO implements CountryDAO {
 		return null;
 	}
 
-	@Override
+	//very similar to the method to search by code except it takes a name 
+	//and since there may be more than one country with the same name it stores them all in an array and return the array
 	public ArrayList<Country> findCountryByName(String name) {
 		ArrayList<Country> countries = new ArrayList<>();
 		String query = "SELECT * FROM country WHERE Name LIKE '%"+name+"%' ;";
@@ -118,7 +127,9 @@ public class MySQLCountryDAO implements CountryDAO {
 		return countries;
 	}
 
-	@Override
+	//receives a Country object, we get the values for each of the attributes saved in variables 
+	//do an INSERT INTO query passing the values taken from the object
+	//return boolean true if everything went, false if it didn't
 	public boolean saveCountry(Country country) {
 		
 		String code = country.getCode();

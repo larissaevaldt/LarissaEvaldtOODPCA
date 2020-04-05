@@ -9,19 +9,22 @@ public class DataSource {
 	private String db = "jdbc:mysql://apontejaj.com:3306/world";
 	private String un = "cctstudent";
 	private String pw = "Pass1234!";
-	// this was in the constructor but we made global
 	private Connection conn;
 	private Statement stmt;
 	private ResultSet rs = null;
-
-	// Inner class to hold an instance of the outer class
+	
+	/*
+	 Inner class to hold an instance of the outer class
+	 DataSourceHelper class is not loaded into memory 
+	 only when someone calls the getInstance method, this class gets loaded and creates the Singleton class instance.
+	 */
 	private static class DataSourceHelper {
 
 		private static DataSource instance = new DataSource();
 
 	}
 
-	// constructor establishing the connection
+	// Constructor establishing the connection made private so we can't direct access 
 	private DataSource() {
 
 		try {
@@ -62,21 +65,19 @@ public class DataSource {
 	}
 
 	// method to close the connection and the statement
-	public void closing() {
+	public void close() {
 		// Close the result set, statement and the connection
 		try {
 			rs.close();
 			stmt.close();
 			conn.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	// method in charge of posting data or saving data into the database
 	public boolean save(String query) {
-
 		try {
 			stmt.execute(query);
 			return true;
@@ -86,6 +87,8 @@ public class DataSource {
 		}
 	}
 	
+	//method to get the instance, classes using the DataSource can't say DataSource = new DataSource because the constructor is private 
+	//instead they need to say DataSorce = DataSource.getInstance();
 	public static DataSource getInstance() {
 		return DataSourceHelper.instance;
 	}
